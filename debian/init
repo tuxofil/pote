@@ -1,0 +1,149 @@
+#!/bin/sh
+
+### BEGIN INIT INFO
+# Provides: pote
+# Required-Start: $remote_fs $syslog
+# Required-Stop: $remote_fs $syslog
+# Default-Start: 2 3 4 5
+# Default-Stop: 0 1 6
+# Short-Description: Start up the Pote daemon
+# Description: Pote - Python Online Test Executor.
+### END INIT INFO
+
+# Author: Aleksey Morarash <aleksey.morarash@gmail.com>
+
+# PATH should only include /usr/* if it runs after the mountnfs.sh script
+PATH=/sbin:/usr/sbin:/bin:/usr/bin
+DESC="Python Online Test Executor"
+NAME=pote
+
+RETVAL=0
+DAEMON=/usr/sbin/poted
+PID_FILE=/var/lib/$NAME/pid
+
+# if the daemon is not installed, just exit immediately
+[ -x "$DAEMON" ] || exit 0
+
+# Load the VERBOSE setting and other rcS variables
+. /lib/init/vars.sh
+
+# Define LSB log_* functions.
+# Depend on lsb-base (>= 3.2-14) to ensure that this file is present
+# and status_of_proc is working.
+. /lib/lsb/init-functions
+
+[ -f /etc/default/$NAME ] && . /etc/default/$NAME
+test -n "$POTE_VERBOSE" && POTE_VERBOSE='--verbose'
+test -n "$POTE_ENVOS" && POTE_ENVOS="--envos $POTE_ENVOS"
+
+do_start(){
+    # Return
+    #   0 if daemon has been started
+    #   1 if daemon was already running
+    #   2 if daemon could not be started
+    start-stop-daemon --quiet --pidfile=$PID_FILE --user=$NAME --startas $DAEMON \
+        --start -- --daemonize --euser=$NAME --pid=$PID_FILE \
+	$POTE_VERBOSE $POTE_ENVOS > /dev/null
+    case "$?" in
+        1) return 1 ;;
+        2) return 2 ;;
+    esac
+    # Not so pretty but:
+    #  1. without status check we cannot be sure the daemon was started;
+    #  2. immediately check sometimes report "not running"
+    sleep 0.5
+    do_status && return 0 || return 2
+}
+
+do_status(){
+    # Return
+    #   0 if program is running.
+    #   1 if program is not running and the pid file exists.
+    #   3 if program is not running.
+    #   4 unable to determine program status.
+    start-stop-daemon --quiet --pidfile=$PID_FILE --user=$NAME --status > /dev/null
+}
+
+do_stop(){
+    # Return
+    #   0 if daemon has been stopped
+    #   1 if daemon was already stopped
+    #   2 if daemon could not be stopped
+    #   other if a failure occurred
+    start-stop-daemon --quiet --pidfile=$PID_FILE --user=$NAME --retry=TERM/5/KILL/2 \
+        --stop > /dev/null
+    case "$?" in
+        0)
+            do_status
+            case "$?" in
+                0) return 2 ;;
+                4) return 4 ;;
+            esac
+            ;;
+        1) return 1 ;;
+        2) return 2 ;;
+    esac
+    # Many daemons don't delete their pidfiles when they exit.
+    rm -f $PID_FILE
+    return 0
+}
+
+do_reload(){
+    start-stop-daemon --quiet --signal HUP --pidfile=$PID_FILE --user=$NAME --stop
+    return 0
+}
+
+case "$1" in
+    start)
+        [ "$VERBOSE" != no ] && log_daemon_msg "Starting $DESC" "$NAME"
+        do_start
+        case "$?" in
+            0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
+            2) [ "$VERBOSE" != no ] && log_end_msg 1 ;;
+        esac
+        ;;
+    stop)
+        [ "$VERBOSE" != no ] && log_daemon_msg "Stopping $DESC" "$NAME"
+        do_stop
+        case "$?" in
+            0|1) [ "$VERBOSE" != no ] && log_end_msg 0 ;;
+            2) [ "$VERBOSE" != no ] && log_end_msg 1 ;;
+        esac
+        ;;
+    status)
+        do_status
+        RETVAL=$?
+        case "$RETVAL" in
+            0) log_success_msg "$NAME is running" ;;
+            4) log_failure_msg "unable to get status for $NAME" ;;
+            *) log_failure_msg "$NAME is not running" ;;
+        esac
+        return $RETVAL
+        ;;
+    reload|force-reload)
+        log_daemon_msg "Reloading $DESC" "$NAME"
+        do_reload
+        log_end_msg $?
+        ;;
+    restart)
+        log_daemon_msg "Restarting $DESC" "$NAME"
+        do_stop
+        case "$?" in
+            0|1)
+                do_start
+                case "$?" in
+                    0) log_end_msg 0 ;;
+                    1) log_end_msg 1 ;; # Old process is still running
+                    *) log_end_msg 1 ;; # Failed to start
+                esac
+                ;;
+            *) log_end_msg 1 ;;
+        esac
+        ;;
+    *)
+        echo "Usage: /etc/init.d/$NAME {start|stop|restart|reload|force-reload}" >&2
+        exit 3
+        ;;
+esac
+
+:

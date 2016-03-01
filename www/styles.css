@@ -1,0 +1,25 @@
+table, tr, th, td {
+    border-collapse: collapse;
+    border-style: solid;
+    border-width: 1;
+}
+
+span#dvStatus {
+    font-weight: bold;
+}
+
+.offline {
+    color: red;
+}
+
+.online {
+    color: green;
+}
+
+.failed {
+    background-color: #FFEEEE;
+}
+
+.succeeded {
+    background-color: #EEFFEE;
+}

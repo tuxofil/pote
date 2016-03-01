@@ -1,0 +1,58 @@
+<html>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="Content-Style-Type" content="text/css">
+    <meta http-equiv="Content-Script-Type" content="text/javascript">
+    <link rel="stylesheet" href="/pote/styles.css">
+    <title>Python Online Test</title>
+  </head>
+  <script src="/pote/pote.js"></script>
+  <body onLoad="updateControls()">
+    <h1>Python Online Test</h1>
+    <p>Server status: <span id="dvStatus"></span></p>
+    <!-- Enqueue form -->
+    <p>
+      <fieldset>
+	<legend>Queue new test</legend>
+	Username: <input id="edUser" />
+	Environment: <select id="edEnvo"></select>
+	Test set: <select id="edTest"></select>
+	<button type="button" onClick="addJob()">Enqueue</button>
+      </fieldset>
+    </p>
+    <!-- Table of enqueued and/or running tests -->
+    <table>
+      <caption>Running jobs</caption>
+      <thead>
+	<tr>
+	  <th>Created</th>
+	  <th>Owner</th>
+	  <th>Envo</th>
+	  <th>Test</th>
+	  <th>Started</th>
+	  <th>Status</th>
+	</tr>
+      </thead>
+      <tbody id="tbJobs"></tbody>
+    </table>
+    <hr>
+    <!-- Table of finished tests -->
+    <table>
+      <caption>Finished jobs</caption>
+      <thead>
+	<tr>
+	  <th>Created</th>
+	  <th>Owner</th>
+	  <th>Envo</th>
+	  <th>Test</th>
+	  <th>Started</th>
+	  <th>Finished</th>
+	  <th>Duration</th>
+	  <th>Status</th>
+	  <th>Log</th>
+	</tr>
+      </thead>
+      <tbody id="tbArchive"></tbody>
+    </table>
+  </body>
+</html>

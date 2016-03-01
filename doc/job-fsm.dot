@@ -1,0 +1,5 @@
+digraph G{
+  label = "Job Finite State Machine";
+  enqueued -> starting -> running -> done -> archived;
+  running -> failed -> archived;
+}

@@ -1,0 +1,138 @@
+#!/usr/bin/env python
+
+"""
+Pote daemon starter script.
+"""
+
+import argparse
+import logging
+import logging.handlers
+import os
+import pwd
+import sys
+
+import pote
+
+
+LOG_FORMAT = '%(asctime)s %(levelname)s %(name)s %(message)s'
+LOG_DATE_FORMAT = '%Y-%m-%d %H:%M:%S'
+
+
+def main():
+    """
+    Main entry point.
+    """
+    # Parse command line arguments
+    parser = argparse.ArgumentParser(
+        description='Python Online Test Executor daemon.')
+    parser.add_argument(
+        '-v', '--verbose', action='store_true',
+        help='Be much verbose.')
+    parser.add_argument(
+        '-d', '--daemonize', action='store_true',
+        help='Daemonize the process.')
+    parser.add_argument(
+        '--bindaddr',
+        help='IP address used by RESTful server to listen'
+        ' for incoming connections.'
+        ' Default is %r' % pote.DEF_BINDADDR)
+    parser.add_argument(
+        '--bindport',
+        help='TCP port number used by RESTful server to listen'
+        ' for incoming connections.'
+        ' Default is %r' % pote.DEF_BINDPORT)
+    parser.add_argument(
+        '--envos', type=int,
+        help='How many environments to use.'
+        ' Default is %r' % pote.DEF_ENVOS_COUNT)
+    parser.add_argument(
+        '--envos-path',
+        help='Base directory for environments.'
+        ' Default is %r' % pote.DEF_ENVOS_PATH)
+    parser.add_argument(
+        '--tests-path',
+        help='Directory with test set modules.'
+        ' Default is %r' % pote.DEF_TESTS_PATH)
+    parser.add_argument(
+        '--queue-path',
+        help='Directory with persistent job queue.'
+        ' Default is %r' % pote.DEF_QUEUE_PATH)
+    parser.add_argument(
+        '--archive-path',
+        help='Directory with job archive storage.'
+        ' Default is %r' % pote.DEF_ARCHIVE_PATH)
+    parser.add_argument(
+        '--euser', default=None,
+        help='Only for daemon mode. The name of effective user'
+        ' to setuid and setgid to')
+    parser.add_argument(
+        '--pid', default=None,
+        help='Only for daemon mode. Path to a pid file to use')
+    parser.add_argument(
+        '--umask', default='022',
+        help='Only for daemon mode. New umask in octal. Default is 022.')
+    parser.add_argument(
+        '--log', default='/var/log/pote/messages.log',
+        help='Only for daemon mode. Path to a file to log to.')
+    args = parser.parse_args()
+    loglevel = logging.DEBUG if args.verbose else logging.INFO
+    if args.daemonize:
+        # Daemon mode
+        import daemon  # import only in production mode
+        daemon_context = daemon.DaemonContext()
+        daemon_context.umask = int(args.umask, 8)
+        if args.euser is not None:
+            pwd_entry = pwd.getpwnam(args.euser)
+            daemon_context.uid = pwd_entry.pw_uid
+            daemon_context.gid = pwd_entry.pw_gid
+        with daemon_context:
+            if args.pid is not None:
+                with open(args.pid, 'w') as fdescr:
+                    fdescr.write('%r\n' % os.getpid())
+            # we need initialize logging only here because all
+            # file descriptors will be closed during daemonization process
+            log_handler = logging.handlers.WatchedFileHandler(args.log)
+            log_handler.setFormatter(
+                logging.Formatter(LOG_FORMAT, LOG_DATE_FORMAT))
+            logger = logging.getLogger()
+            logger.setLevel(loglevel)
+            logger.addHandler(log_handler)
+            try:
+                start_server(args)
+                sys.exit(0)
+            except Exception:
+                logger.critical('Abnormal termination', exc_info=True)
+                sys.exit(1)
+    # Foreground mode
+    logging.basicConfig(
+        format=LOG_FORMAT,
+        datefmt=LOG_DATE_FORMAT,
+        level=loglevel)
+    try:
+        start_server(args)
+    except KeyboardInterrupt:
+        logging.getLogger().info('interrupted by user (^C)')
+    except Exception:
+        logging.getLogger().critical('Abnormal termination', exc_info=True)
+        sys.exit(1)
+
+
+def start_server(args):
+    """
+    Launch the Pote server.
+
+    :param args: parsed command line arguments.
+    :type args: argparse.Namespace
+    """
+    pote.start_server(
+        bindaddr=args.bindaddr,
+        bindport=args.bindport,
+        envos_count=args.envos,
+        envos_path=args.envos_path,
+        tests_path=args.tests_path,
+        queue_path=args.queue_path,
+        archive_path=args.archive_path)
+
+
+if __name__ == '__main__':
+    main()

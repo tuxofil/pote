@@ -1,0 +1,9 @@
+/var/log/pote/messages.log {
+    daily
+    maxsize 50M
+    compress
+    delaycompress
+    missingok
+    notifempty
+    maxage 5
+}

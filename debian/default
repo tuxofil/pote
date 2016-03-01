@@ -1,0 +1,10 @@
+##
+## Config file for a Python Online Test Executor daemon
+##
+
+# If set, daemon will be started with DEBUG loglevel
+POTE_VERBOSE=1
+
+# Set preferred environment count here. If not set, default
+# will be used.
+#POTE_ENVOS=10

@@ -1,0 +1,17 @@
+Source: pote
+Section: misc
+Priority: extra
+Maintainer: Aleksey Morarash <aleksey.morarash@gmail.com>
+Build-Depends: debhelper, python-setuptools, graphviz
+XS-Python-Version: 2.7
+Standards-Version: 3.9.3
+Homepage: https://github.com/tuxofil/pote
+Vcs-Browser: https://github.com/tuxofil/pote
+Vcs-Git: https://github.com/tuxofil/pote.git
+
+Package: pote
+Architecture: all
+Depends: adduser, python, python-daemon, nginx, logrotate
+Description: Python Online Test Executor
+ Provide Web interface to launch Python tests in
+ a separated environments.

@@ -1,0 +1,13 @@
+digraph G{
+  label = "HTTP request serving schema";
+  rankdir = TB;
+  static [
+    shape = folder
+  ];
+  archive [
+    shape = folder
+  ];
+  browser -> nginx -> static;
+  nginx -> pote -> testing -> archive;
+  nginx -> archive;
+}

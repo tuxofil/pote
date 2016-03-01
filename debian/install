@@ -1,0 +1,4 @@
+bin/poted /usr/sbin
+etc/nginx/pote.conf /etc/nginx/sites-available
+www /usr/share/pote
+tests /usr/share/pote

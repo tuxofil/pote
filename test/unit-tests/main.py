@@ -28,6 +28,7 @@ class PoteMainTest(unittest.TestCase):
             shutil.rmtree('poted')
         self.proc = subprocess.Popen(
             ['../../bin/poted', '--verbose',
+             '--envos', '3',
              '--envos-path', 'poted/envos',
              '--tests-path', '../../tests',
              '--queue-path', 'poted/tests',

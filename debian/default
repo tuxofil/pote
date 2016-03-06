@@ -3,8 +3,8 @@
 ##
 
 # If set, daemon will be started with DEBUG loglevel
-POTE_VERBOSE=1
+#POTE_VERBOSE=1
 
 # Set preferred environment count here. If not set, default
 # will be used.
-#POTE_ENVOS=10
+POTE_ENVOS=100

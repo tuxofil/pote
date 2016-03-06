@@ -18,7 +18,7 @@ LOGGER = logging.getLogger(__name__)
 
 DEF_BINDADDR = '127.0.0.1'  # default interface to listen to
 DEF_BINDPORT = 8901  # default TCP port number to listen to
-DEF_ENVOS_COUNT = 3
+DEF_ENVOS_COUNT = 100
 DEF_ENVOS_PATH = '/var/lib/pote/envos'
 DEF_TESTS_PATH = '/usr/share/pote/tests'
 DEF_QUEUE_PATH = '/var/lib/pote/queue'

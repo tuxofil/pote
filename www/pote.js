@@ -101,16 +101,15 @@ function updateEnvos(){
     req.send();
     if(req.status != 200) return;
     var edEnvo = document.getElementById("edEnvo");
-    var envos = JSON.parse(req.responseText)
-    if(envos.length != edEnvo.length - 1){
+    var envos_count = JSON.parse(req.responseText)
+    if(envos_count != edEnvo.length - 1){
 	// envos count has been changed.
-	// TODO: make incremental update of the <select> element
 	while(edEnvo.length) edEnvo.remove(0);
 	edEnvo.add(document.createElement("option"));
-	for(var i = 0; i < envos.length; i++){
+	for(var i = 0; i < envos_count; i++){
 	    var option = document.createElement("option");
-	    option.text = envos[i][0];
-	    option.value = envos[i][1];
+	    option.text = "Envo#" + String(i);
+	    option.value = i;
 	    edEnvo.add(option)
 	}
     }

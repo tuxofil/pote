@@ -113,9 +113,7 @@ class PoteApiServerHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                 self.end_headers()
                 raise RepliedException
             elif path == 'envo':
-                self.reply_with_json(
-                    [['Envo#%r' % i, i]
-                     for i in self.server.scheduler.envos()])
+                self.reply_with_json(self.server.scheduler.envos_count)
             elif path == 'test':
                 self.reply_with_json(sorted(self.server.tests.available()))
             elif path == 'job':
@@ -134,7 +132,7 @@ class PoteApiServerHandler(BaseHTTPServer.BaseHTTPRequestHandler):
                     self.send_error(400, 'Bad user name')
                 try:
                     envo = int(request.get('envo'))
-                    if not (0 <= envo <= self.server.scheduler.envos):
+                    if not (0 <= envo <= self.server.scheduler.envos_count):
                         self.send_error(400, 'Bad environment ID')
                 except ValueError:
                     self.send_error(400, 'Bad environment ID')

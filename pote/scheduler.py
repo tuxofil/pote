@@ -72,14 +72,6 @@ class PoteScheduler(threading.Thread):
         self.archive = archive
         self.mailbox = Queue.Queue()
 
-    def envos(self):
-        """
-        Return list of available environment IDs.
-
-        :rtype: list of integers
-        """
-        return range(self.envos_count)
-
     def queued(self):
         """
         Return list of all jobs queued.

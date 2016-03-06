@@ -1,3 +1,12 @@
+pote (0.1.1) unstable; urgency=low
+
+  * unit test: run daemon with restricted envos count
+  * switch to "production" mode: upper log threshold, increase envos count
+  * output HTTP request processing with DEBUG loglevel
+  * simplify publishing available environments
+
+ -- Aleksey Morarash <aleksey.morarash@gmail.com>  Sun, 06 Mar 2016 11:09:06 +0200
+
 pote (0.1.0) unstable; urgency=low
 
   * Initial release.

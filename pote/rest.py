@@ -222,7 +222,7 @@ class PoteApiServerHandler(BaseHTTPServer.BaseHTTPRequestHandler):
         There is no stdout in daemonized state so relay messages
         to the 'logging' facility.
         """
-        self.logger.info(msg_format, *args)
+        self.logger.debug(msg_format, *args)
 
     def version_string(self):
         """
